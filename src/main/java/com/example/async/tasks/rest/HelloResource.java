@@ -11,7 +11,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/hello")
 public class HelloResource {
 
-    @GetMapping("/non-logged-in")
+    @GetMapping(path = "/non-logged-in", produces = APPLICATION_JSON_VALUE)
     public HelloMessage hello() {
         return new HelloMessage("Hello");
     }

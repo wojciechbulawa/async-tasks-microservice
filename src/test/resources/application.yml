@@ -1,0 +1,6 @@
+auth:
+  users:
+    - username: 'test'
+      password: 'test'
+      roles:
+        - 'USER'

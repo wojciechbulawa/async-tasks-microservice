@@ -1,5 +1,6 @@
 package com.example.async.tasks.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,13 +8,17 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-public class SecurityConfig {
+@RequiredArgsConstructor
+class SecurityConfig {
+
+    private final InMemoryUsers inMemoryUsers;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auths -> auths
                         .anyRequest().authenticated()
@@ -23,19 +28,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
+    WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web
                 .ignoring()
                 .requestMatchers("/api/hello/non-logged-in");
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("user")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    UserDetailsManager userDetailsService() {
+        UserDetails[] users = inMemoryUsers.users().stream()
+                .map(testUser -> User.withDefaultPasswordEncoder()
+                        .username(testUser.getUsername())
+                        .password(testUser.getPassword())
+                        .roles(testUser.getRoles().toArray(String[]::new))
+                        .build())
+                .toArray(UserDetails[]::new);
+
+        return new InMemoryUserDetailsManager(users);
     }
 }
