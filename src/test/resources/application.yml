@@ -4,3 +4,8 @@ auth:
       password: 'test'
       roles:
         - 'USER'
+    - username: 'adminTest'
+      password: 'adminTest'
+      roles:
+        - 'ADMIN'
+        - 'USER'

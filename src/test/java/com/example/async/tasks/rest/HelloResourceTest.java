@@ -20,10 +20,12 @@ class HelloResourceTest {
     private InMemoryUsers inMemoryUsers;
 
     private InMemoryUser user;
+    private InMemoryUser admin;
 
     @BeforeEach
     void setUp() {
         user = inMemoryUsers.findUserWithRole("USER");
+        admin = inMemoryUsers.findUserWithRole("ADMIN");
     }
 
     @Test
@@ -42,6 +44,14 @@ class HelloResourceTest {
 
         // then
         assertThat(message.getMessage()).isEqualTo(expectedMsg);
+    }
+
+    @Test
+    void shouldRespondWithUnauthorized_whenNotIsLoggedIn_andResourceIsSecured() {
+        RestAssured.given()
+                .when().get("/api/hello/logged-in")
+                .then()
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -66,7 +76,7 @@ class HelloResourceTest {
     }
 
     @Test
-    void shouldRespond_whenUserIsLoggedIn_andResourceIstSecured() {
+    void shouldRespond_whenUserIsLoggedIn_andResourceIsSecured() {
         // given
         String expectedMsg = "Hello logged-in user";
 
@@ -76,6 +86,38 @@ class HelloResourceTest {
                 .preemptive()
                 .basic(user.getUsername(), user.getPassword())
                 .when().get("/api/hello/logged-in")
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .extract()
+                .as(HelloMessage.class);
+
+        // then
+        assertThat(message.getMessage()).isEqualTo(expectedMsg);
+    }
+
+    @Test
+    void shouldRespondWithUnauthorized_whenUserIsLoggedIn_andResourceIsAuthorizedOnlyForAdmin() {
+        RestAssured.given()
+                .auth()
+                .preemptive()
+                .basic(user.getUsername(), user.getPassword())
+                .when().get("/api/hello/admin")
+                .then()
+                .statusCode(HttpStatus.FORBIDDEN.value());
+    }
+
+    @Test
+    void shouldRespond_whenAdminIsLoggedIn_andResourceIsAuthorizedOnlyForAdmin() {
+        // given
+        String expectedMsg = "Hello admin";
+
+        // when
+        HelloMessage message = RestAssured.given()
+                .auth()
+                .preemptive()
+                .basic(admin.getUsername(), admin.getPassword())
+                .when().get("/api/hello/admin")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

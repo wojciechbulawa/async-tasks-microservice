@@ -1,6 +1,7 @@
 package com.example.async.tasks.rest;
 
 import com.example.async.tasks.dto.HelloMessage;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,5 +20,11 @@ public class HelloResource {
     @GetMapping(path = "/logged-in", produces = APPLICATION_JSON_VALUE)
     public HelloMessage helloLoggedIn() {
         return new HelloMessage("Hello logged-in user");
+    }
+
+    @Secured("ROLE_ADMIN")
+    @GetMapping(path = "/admin", produces = APPLICATION_JSON_VALUE)
+    public HelloMessage helloAdmin() {
+        return new HelloMessage("Hello admin");
     }
 }
