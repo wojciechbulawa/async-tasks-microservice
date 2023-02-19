@@ -1,3 +1,15 @@
+spring:
+  datasource:
+    username: root
+    password: secret
+    url: jdbc:mysql://localhost:3307/tasks
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  flyway:
+    enabled: true
+    locations: 'classpath:db/migrations'
+
 auth:
   users:
     - username: 'user'

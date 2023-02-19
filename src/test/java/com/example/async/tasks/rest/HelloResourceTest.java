@@ -1,13 +1,12 @@
 package com.example.async.tasks.rest;
 
-import com.example.async.tasks.config.InMemoryUser;
-import com.example.async.tasks.config.InMemoryUsers;
 import com.example.async.tasks.dto.HelloMessage;
+import com.example.async.tasks.utils.Credentials;
 import com.example.async.tasks.utils.IntegrationTest;
+import com.example.async.tasks.utils.TestUsers;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -16,16 +15,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @IntegrationTest
 class HelloResourceTest {
 
-    @Autowired
-    private InMemoryUsers inMemoryUsers;
-
-    private InMemoryUser user;
-    private InMemoryUser admin;
+    private Credentials user;
+    private Credentials admin;
 
     @BeforeEach
     void setUp() {
-        user = inMemoryUsers.findUserWithRole("USER");
-        admin = inMemoryUsers.findUserWithRole("ADMIN");
+        user = TestUsers.getUser();
+        admin = TestUsers.getAdmin();
     }
 
     @Test
@@ -63,7 +59,7 @@ class HelloResourceTest {
         HelloMessage message = RestAssured.given()
                 .auth()
                 .preemptive()
-                .basic(user.getUsername(), user.getPassword())
+                .basic(user.username(), user.password())
                 .when().get("/api/hello/non-logged-in")
                 .then()
                 .statusCode(HttpStatus.OK.value())
@@ -83,8 +79,7 @@ class HelloResourceTest {
         // when
         HelloMessage message = RestAssured.given()
                 .auth()
-                .preemptive()
-                .basic(user.getUsername(), user.getPassword())
+                .basic(user.username(), user.password())
                 .when().get("/api/hello/logged-in")
                 .then()
                 .statusCode(HttpStatus.OK.value())
@@ -100,8 +95,7 @@ class HelloResourceTest {
     void shouldRespondWithUnauthorized_whenUserIsLoggedIn_andResourceIsAuthorizedOnlyForAdmin() {
         RestAssured.given()
                 .auth()
-                .preemptive()
-                .basic(user.getUsername(), user.getPassword())
+                .basic(user.username(), user.password())
                 .when().get("/api/hello/admin")
                 .then()
                 .statusCode(HttpStatus.FORBIDDEN.value());
@@ -115,8 +109,7 @@ class HelloResourceTest {
         // when
         HelloMessage message = RestAssured.given()
                 .auth()
-                .preemptive()
-                .basic(admin.getUsername(), admin.getPassword())
+                .basic(admin.username(), admin.password())
                 .when().get("/api/hello/admin")
                 .then()
                 .statusCode(HttpStatus.OK.value())
