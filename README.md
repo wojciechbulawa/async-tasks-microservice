@@ -4,4 +4,4 @@
 ```bash
 ./mvnw spring-boot:run
 ```
-… and go to [http://localhost:8080/api/hello](http://localhost:8080/api/hello)
+… and go to [http://localhost:8080/api/hello/non-logged-in](http://localhost:8080/api/hello/non-logged-in)

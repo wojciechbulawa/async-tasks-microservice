@@ -8,8 +8,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/hello")
 public class HelloResource {
 
-    @GetMapping
+    @GetMapping("/non-logged-in")
     public String hello() {
         return "Hello";
+    }
+
+    @GetMapping("/logged-in")
+    public String helloLoggedIn() {
+        return "Hello logged-in user";
     }
 }
