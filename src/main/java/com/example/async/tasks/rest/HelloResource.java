@@ -1,6 +1,7 @@
 package com.example.async.tasks.rest;
 
 import com.example.async.tasks.dto.HelloMessage;
+import com.example.async.tasks.mappers.HelloMessageMapper;
 import com.example.async.tasks.message.MsgSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.annotation.Secured;
@@ -16,15 +17,16 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class HelloResource {
 
     private final MsgSender msgSender;
+    private final HelloMessageMapper mapper;
 
     @GetMapping(path = "/non-logged-in", produces = APPLICATION_JSON_VALUE)
     public HelloMessage hello() {
-        return new HelloMessage("Hello");
+        return mapper.toMsg("Hello");
     }
 
     @GetMapping(path = "/logged-in", produces = APPLICATION_JSON_VALUE)
     public HelloMessage helloLoggedIn() {
-        HelloMessage msg = new HelloMessage("Hello logged-in user");
+        HelloMessage msg = mapper.toMsg("Hello logged-in user");
         msgSender.send(msg);
         return msg;
     }
@@ -32,7 +34,7 @@ public class HelloResource {
     @Secured("ROLE_ADMIN")
     @GetMapping(path = "/admin", produces = APPLICATION_JSON_VALUE)
     public HelloMessage helloAdmin() {
-        HelloMessage msg = new HelloMessage("Hello admin");
+        HelloMessage msg = mapper.toMsg("Hello admin");
         msgSender.sendAsAdmin(msg);
         return msg;
     }
