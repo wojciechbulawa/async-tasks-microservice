@@ -9,6 +9,11 @@ spring:
   flyway:
     enabled: true
     locations: 'classpath:db/migrations'
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: rabbit
+    password: rabbit
 
 auth:
   users:
