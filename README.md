@@ -4,7 +4,7 @@
 
 ```bash
 docker-compose up -d
-./mvnw spring-boot:run
+./mvnw clean install -DskipTests && ./mvnw spring-boot:run
 ```
 
 Created users:
@@ -24,7 +24,7 @@ Swagger UI is at [localhost:8080/swagger-ui.html](localhost:8080/swagger-ui.html
 
 ```bash
 docker-compose up -d
-./mvnw clean intall
+./mvnw clean install
 
 docker-compose down -v
 ```
