@@ -3,7 +3,7 @@ package com.example.async.tasks.rest;
 import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
-import com.example.async.tasks.entity.TaskStatus;
+import com.example.async.tasks.entity.Status;
 import com.example.async.tasks.utils.Credentials;
 import com.example.async.tasks.utils.IntegrationTest;
 import com.example.async.tasks.utils.TestUsers;
@@ -48,13 +48,27 @@ class GetTasksResourceTest {
         TaskDto taskDto = response.body().as(TaskDto.class);
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
-                .status(TaskStatus.RECEIVED.name())
+                .status(Status.RECEIVED.name())
                 .percentage(0)
                 .position(null)
                 .typos(null)
-                .pattern(null)
-                .input(null)
+                .pattern(pattern)
+                .input(input)
                 .build());
+    }
+
+    @Test
+    void shouldReturnNotFound_whenRequestsNonExistingTask() {
+        // given
+        long id = 2783912973L;
+
+
+        // when
+        ExtractableResponse<Response> response = getNewTask(id);
+
+        // then
+        assertThat(response.statusCode())
+                .isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private ExtractableResponse<Response> getNewTask(Long id) {

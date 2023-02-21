@@ -14,14 +14,3 @@ spring:
     port: 5672
     username: rabbit
     password: rabbit
-
-auth:
-  users:
-    - username: 'user'
-      password: 'user'
-      roles:
-        - 'USER'
-    - username: 'admin'
-      password: 'admin'
-      roles:
-        - 'ADMIN,USER'

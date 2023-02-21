@@ -3,7 +3,7 @@ package com.example.async.tasks.rest;
 import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
-import com.example.async.tasks.entity.TaskStatus;
+import com.example.async.tasks.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,33 +25,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/tasks")
 public class TasksResource {
 
+    private final TaskService taskService;
+
     @Secured("ROLE_USER")
     @PostMapping(path = "/create")
     public ResponseEntity<TaskResponseDto> create(@Valid @RequestBody TaskRequestDto taskRequestDto) {
         log.info("Received /api/tasks/create request.\nPattern: {}\nInput: {}",
                 taskRequestDto.getPattern(), taskRequestDto.getInput());
-        TaskResponseDto taskResponseDto = new TaskResponseDto(1L);
-
+        TaskResponseDto response = taskService.save(taskRequestDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(taskResponseDto);
+                .body(response);
     }
 
     @Secured("ROLE_USER")
     @GetMapping(path = "/{id}")
     public ResponseEntity<TaskDto> get(@PathVariable Long id) {
         log.info("Received /api/tasks/{} request", id);
-        TaskDto taskDto = TaskDto.builder()
-                .id(id)
-                .status(TaskStatus.RECEIVED.name())
-                .percentage(0)
-                .position(null)
-                .typos(null)
-                .pattern(null)
-                .input(null)
-                .build();
 
-        return ResponseEntity.ok(taskDto);
+        return taskService.find(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

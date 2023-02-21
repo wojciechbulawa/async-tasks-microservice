@@ -1,6 +1,6 @@
 package com.example.async.tasks.entity;
 
-public enum TaskStatus {
+public enum Status {
     RECEIVED,
     STARTED,
     COMPLETED
