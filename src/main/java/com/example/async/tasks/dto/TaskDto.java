@@ -1,6 +1,5 @@
 package com.example.async.tasks.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TaskDto {
 
-    @NotBlank
+    private Long id;
+    private String status;
+    private Integer percentage;
+    private Integer position;
+    private Integer typos;
     private String pattern;
-    @NotBlank
     private String input;
 }
