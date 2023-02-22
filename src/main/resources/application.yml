@@ -21,11 +21,11 @@ executors:
     await-termination: 20s
 
 tasks:
-  main-thread-pool: 4
-  sub-thread-pool: 16
+  main-thread-pool: 3
+  sub-thread-pool: 12
   cache:
     enabled: true
     entry-lifetime: 1h
   delay:
-    min-millis: 1000
+    min-millis: 3000
     max-millis: 10000
