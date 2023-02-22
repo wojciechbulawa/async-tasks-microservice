@@ -10,11 +10,14 @@ import com.example.async.tasks.repository.TaskRepository;
 import com.example.async.tasks.service.cache.TasksCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -46,6 +49,15 @@ public class TaskService {
 
         log.info("Found task with id: {}", id);
         return Optional.of(mapper.toFullDto(byId.get()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<TaskDto> findAll(Pageable pageable) {
+        Page<Task> page = repository.findAll(pageable);
+        log.info("Found {} tasks", page.getSize());
+        return page.stream()
+                .map(mapper::toFullDto)
+                .toList();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

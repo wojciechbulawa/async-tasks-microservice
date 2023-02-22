@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f1dbb119-c3df-4049-b869-4bd41fc3da79",
+		"_postman_id": "c6a713a8-c72d-4452-9655-d94af7fa3744",
 		"name": "async-tasks",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -182,6 +182,51 @@
 						"api",
 						"tasks",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "api/tasks",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "user",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "user",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/tasks?page=0&size=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						}
 					]
 				}
 			},

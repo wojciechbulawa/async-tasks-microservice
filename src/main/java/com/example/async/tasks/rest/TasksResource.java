@@ -12,6 +12,7 @@ import com.example.async.tasks.service.cache.TasksCache;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -63,6 +66,13 @@ public class TasksResource {
         return taskService.find(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @Secured("ROLE_USER")
+    @GetMapping
+    public ResponseEntity<List<TaskDto>> getAll(Pageable pageable) {
+        log.info("Received /api/tasks request");
+        return ResponseEntity.ok(taskService.findAll(pageable));
     }
 
 }
