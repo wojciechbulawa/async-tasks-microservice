@@ -21,8 +21,8 @@ executors:
     await-termination: 20s
 
 tasks:
-  main-thread-pool: 3
-  sub-thread-pool: 12
+  main-thread-pool: 8
+  sub-thread-pool: 16
   cache:
     enabled: true
     entry-lifetime: 1h

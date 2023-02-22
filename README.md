@@ -1,5 +1,9 @@
 # async-tasks-microservice
 
+> **Note**
+>
+> The project requires java 17
+
 ## Run the app
 
 ```bash
@@ -27,8 +31,9 @@ Swagger UI is at [localhost:8080/swagger-ui.html](localhost:8080/swagger-ui.html
 
 ## Properties
 
-You can manage how long artificial processing (Thread.sleep) should last by changing `tasks.delay` property 
+You can manage how long artificial processing (Thread.sleep) should last by changing `tasks.delay` property
 at``application.yml`:
+
 ```yaml
 tasks:
   main-thread-pool: 3
@@ -50,3 +55,18 @@ docker-compose up -d
 
 docker-compose down -v
 ```
+
+## Further improvements:
+
+- Replace cache per app instance with, e.g., Redis.
+- Implement dead letter and error handling using, e.g., RabbitMQ.
+    - Add awaiting for RabbitMQ to make sure integration tests will stay manageable.
+    - MainJob may need to be revised.
+- Add caching subtasks' results
+- Add processing edge cases (& validation)
+
+## Additional improvements:
+
+- Replace basic auth with OAuth2.
+- Add a separate endpoint for users to log in.
+- Add endpoint for user registration.
