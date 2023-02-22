@@ -4,6 +4,7 @@ import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
 import com.example.async.tasks.entity.Status;
+import com.example.async.tasks.utils.AwaitHelper;
 import com.example.async.tasks.utils.Credentials;
 import com.example.async.tasks.utils.IntegrationTest;
 import com.example.async.tasks.utils.TestUsers;
@@ -13,6 +14,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,6 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 class GetTasksResourceTest {
+
+    @Autowired
+    private AwaitHelper waiter;
 
     private Credentials user;
 
@@ -34,6 +39,7 @@ class GetTasksResourceTest {
         String pattern = "BCD";
         String input = "ABCD";
         Long id = postNewTask(pattern, input);
+        waiter.awaitTaskStarted(id);
 
         // when
         ExtractableResponse<Response> response = getNewTask(id);
@@ -48,7 +54,7 @@ class GetTasksResourceTest {
         TaskDto taskDto = response.body().as(TaskDto.class);
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
-                .status(Status.RECEIVED.name())
+                .status(Status.STARTED.name())
                 .percentage(0)
                 .position(null)
                 .typos(null)
@@ -61,7 +67,6 @@ class GetTasksResourceTest {
     void shouldReturnNotFound_whenRequestsNonExistingTask() {
         // given
         long id = 2783912973L;
-
 
         // when
         ExtractableResponse<Response> response = getNewTask(id);
