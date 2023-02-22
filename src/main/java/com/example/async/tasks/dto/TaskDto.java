@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -13,7 +15,7 @@ public class TaskDto {
 
     private Long id;
     private String status;
-    private Integer percentage;
+    private BigDecimal percentage;
     private Integer position;
     private Integer typos;
     private String pattern;

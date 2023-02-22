@@ -18,10 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 class ProcessTasksResourceTest {
+
+    private static final BigDecimal HUNDRED = BigDecimal.valueOf(100.00)
+            .setScale(2);
 
     @Autowired
     private AwaitHelper waiter;
@@ -55,7 +60,7 @@ class ProcessTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.COMPLETED.name())
-                .percentage(100)
+                .percentage(HUNDRED)
                 .position(1)
                 .typos(0)
                 .pattern(pattern)
@@ -85,7 +90,7 @@ class ProcessTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.COMPLETED.name())
-                .percentage(100)
+                .percentage(HUNDRED)
                 .position(1)
                 .typos(1)
                 .pattern(pattern)
@@ -115,7 +120,7 @@ class ProcessTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.COMPLETED.name())
-                .percentage(100)
+                .percentage(HUNDRED)
                 .position(4)
                 .typos(1)
                 .pattern(pattern)
@@ -145,7 +150,7 @@ class ProcessTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.COMPLETED.name())
-                .percentage(100)
+                .percentage(HUNDRED)
                 .position(0)
                 .typos(0)
                 .pattern(pattern)
@@ -175,7 +180,7 @@ class ProcessTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.COMPLETED.name())
-                .percentage(100)
+                .percentage(HUNDRED)
                 .position(1)
                 .typos(2)
                 .pattern(pattern)

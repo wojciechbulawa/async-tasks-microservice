@@ -2,6 +2,7 @@ package com.example.async.tasks.rest;
 
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
+import com.example.async.tasks.utils.AwaitHelper;
 import com.example.async.tasks.utils.Credentials;
 import com.example.async.tasks.utils.IntegrationTest;
 import com.example.async.tasks.utils.TestUsers;
@@ -11,6 +12,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -20,6 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 class CreateTasksResourceTest {
+
+    @Autowired
+    private AwaitHelper waiter;
 
     private Credentials user;
 
@@ -38,6 +43,7 @@ class CreateTasksResourceTest {
 
         // when
         ExtractableResponse<Response> response = postNewTask(body);
+        waiter.awaitTasksStarted(1);
 
         // then
         assertThat(response.statusCode())

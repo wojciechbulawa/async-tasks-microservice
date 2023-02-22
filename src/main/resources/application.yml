@@ -14,3 +14,15 @@ spring:
     port: 5672
     username: rabbit
     password: rabbit
+
+executors:
+  thread-pool:
+    keep-alive-time: 1m
+    await-termination: 20s
+
+tasks:
+  main-thread-pool: 4
+  sub-thread-pool: 16
+  delay:
+    min-millis: 1000
+    max-millis: 10000

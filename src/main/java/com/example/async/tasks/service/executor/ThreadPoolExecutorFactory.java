@@ -21,10 +21,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class ThreadPoolExecutorFactory {
 
+    private final ThreadPoolProperties props;
+
     public ExecutorService create(@Min(1) int size, @NotBlank String name) {
         ThreadFactory factory = new NamedThreadFactory(name);
         return new ThreadPoolExecutor(size, size,
-                1L, TimeUnit.MINUTES,
+                props.keepAliveTime().toNanos(), TimeUnit.NANOSECONDS,
                 new LinkedBlockingDeque<>(),
                 factory);
     }
@@ -32,7 +34,7 @@ public class ThreadPoolExecutorFactory {
     public void shutdown(ExecutorService executorService) {
         executorService.shutdown();
         try {
-            if (!executorService.awaitTermination(20L, TimeUnit.SECONDS)) {
+            if (!executorService.awaitTermination(props.awaitTermination().toNanos(), TimeUnit.NANOSECONDS)) {
                 executorService.shutdown();
             }
         } catch (InterruptedException e) {

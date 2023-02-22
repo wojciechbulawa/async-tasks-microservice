@@ -18,10 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.math.BigDecimal;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @IntegrationTest
 class GetTasksResourceTest {
+
+    private static final BigDecimal ZERO = BigDecimal.valueOf(0.00)
+            .setScale(2);
 
     @Autowired
     private AwaitHelper waiter;
@@ -55,7 +60,7 @@ class GetTasksResourceTest {
         assertThat(taskDto).isEqualTo(TaskDto.builder()
                 .id(id)
                 .status(Status.STARTED.name())
-                .percentage(0)
+                .percentage(ZERO)
                 .position(null)
                 .typos(null)
                 .pattern(pattern)

@@ -1,24 +1,27 @@
 package com.example.async.tasks.service;
 
-import com.example.async.tasks.repository.TaskRepository;
 import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
 import com.example.async.tasks.entity.Status;
 import com.example.async.tasks.entity.Task;
 import com.example.async.tasks.mappers.TaskMapper;
+import com.example.async.tasks.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
+
+    private static final BigDecimal MAX_PERCENTAGE = BigDecimal.valueOf(100);
 
     private final TaskRepository repository;
     private final TaskMapper mapper;
@@ -27,6 +30,7 @@ public class TaskService {
     public TaskResponseDto save(TaskRequestDto dto) {
         Task task = mapper.toEntity(dto);
         Task saved = repository.save(task);
+        log.info("Saved task[id={}]", saved.getId());
         return mapper.toResponse(saved);
     }
 
@@ -49,15 +53,18 @@ public class TaskService {
                     entity.setStatus(Status.STARTED);
                     return entity;
                 });
+        log.info("Updated task[id={}] as started", task.id());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void addPercentage(ProcessingTask task, int points) {
+    public void addPercentage(ProcessingTask task, BigDecimal points) {
         repository.findById(task.id())
                 .map(entity -> {
-                    Integer percentage = entity.getPercentage();
-                    if (percentage < 100) {
-                        entity.setPercentage(percentage + points);
+                    BigDecimal current = entity.getPercentage();
+                    BigDecimal sum = current.add(points);
+                    if (lessOrEqualToMax(sum)) {
+                        entity.setPercentage(sum);
+                        log.info("Updated task[id={}] progress: {}", task.id(), sum);
                     }
                     return entity;
                 });
@@ -68,11 +75,16 @@ public class TaskService {
         repository.findById(task.id())
                 .map(entity -> {
                     entity.setStatus(Status.COMPLETED);
-                    entity.setPercentage(100);
+                    entity.setPercentage(MAX_PERCENTAGE);
                     entity.setPosition(position);
                     entity.setTypos(typos);
                     return entity;
                 });
+        log.info("Updated task[id={}] as completed", task.id());
+    }
+
+    private static boolean lessOrEqualToMax(BigDecimal percentage) {
+        return MAX_PERCENTAGE.compareTo(percentage) >= 0;
     }
 
 }

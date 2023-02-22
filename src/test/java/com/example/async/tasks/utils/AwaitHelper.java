@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class AwaitHelper {
 
     private final TestTaskRepository testTaskRepository;
+    private final TestAwaitProperties props;
 
     public void awaitTaskCompleted(@NonNull Long id) {
         awaitTask(id, Status.COMPLETED);
@@ -24,15 +25,20 @@ public class AwaitHelper {
         awaitTask(id, Status.STARTED);
     }
 
+    public void awaitTasksStarted(int count) {
+        defaultFactory()
+                .until(() -> testTaskRepository.countWithStatus(Status.STARTED) == count);
+    }
+
     private void awaitTask(@NonNull Long id, @NonNull Status status) {
         defaultFactory()
                 .until(() -> status.equals(testTaskRepository.findStatusOf(id)));
     }
 
-    private static ConditionFactory defaultFactory() {
+    private ConditionFactory defaultFactory() {
         return Awaitility.await()
-                .atMost(10, TimeUnit.SECONDS)
-                .pollDelay(10, TimeUnit.MILLISECONDS)
-                .pollInterval(10, TimeUnit.MILLISECONDS);
+                .atMost(props.atMostSec().getSeconds(), TimeUnit.SECONDS)
+                .pollDelay(props.pollDelayMs().toMillis(), TimeUnit.MILLISECONDS)
+                .pollInterval(props.pollIntervalMs().toMillis(), TimeUnit.MILLISECONDS);
     }
 }

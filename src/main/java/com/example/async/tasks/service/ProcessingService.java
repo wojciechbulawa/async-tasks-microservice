@@ -1,6 +1,7 @@
 package com.example.async.tasks.service;
 
 import com.example.async.tasks.service.executor.ThreadPoolExecutorFactory;
+import com.example.async.tasks.service.sub.SubJobFactory;
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 
@@ -10,34 +11,34 @@ import java.util.concurrent.ExecutorService;
 public class ProcessingService {
 
     private final TaskService taskService;
-    private final TextProcessor textProcessor;
     private final ExecutorService mainExecutor;
-    private final ThreadPoolExecutorFactory factory;
+    private final ExecutorService subExecutor;
+    private final ThreadPoolExecutorFactory poolExecutorFactory;
+    private final SubJobFactory subJobFactory;
 
     public ProcessingService(TaskService taskService,
-                             ThreadPoolExecutorFactory factory) {
+                             ThreadPoolExecutorFactory poolExecutorFactory,
+                             TasksThreadPoolProperties properties,
+                             SubJobFactory subJobFactory) {
         this.taskService = taskService;
-        this.textProcessor = new SimpleTextProcessor();
-        this.mainExecutor = factory.create(2, "mainProcessor");
-        this.factory = factory;
+        this.mainExecutor = poolExecutorFactory.create(properties.mainThreadPool(), "main");
+        this.subExecutor = poolExecutorFactory.create(properties.subThreadPool(), "sub");
+        this.poolExecutorFactory = poolExecutorFactory;
+        this.subJobFactory = subJobFactory;
     }
 
     public void process(ProcessingTask task) {
-        mainExecutor.submit(() -> {
-            taskService.start(task);
-            try {
-                Thread.sleep(1000 * 5);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            ProcessedText processed = textProcessor.process(task.pattern(), task.text());
-            taskService.complete(task, processed.position(), processed.typos());
-        });
+        MainJob job = MainJob.create(task,
+                subExecutor,
+                taskService,
+                subJobFactory);
+        mainExecutor.submit(job);
     }
 
     @PreDestroy
     void preDestroy() {
-        factory.shutdown(mainExecutor);
+        poolExecutorFactory.shutdown(mainExecutor);
+        poolExecutorFactory.shutdown(subExecutor);
     }
 
 }

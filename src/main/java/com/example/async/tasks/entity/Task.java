@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @ToString
@@ -36,7 +38,7 @@ public class Task {
     private Status status = Status.RECEIVED;
 
     @Column(nullable = false)
-    private Integer percentage = 0;
+    private BigDecimal percentage = BigDecimal.ZERO;
 
     private Integer position;
 

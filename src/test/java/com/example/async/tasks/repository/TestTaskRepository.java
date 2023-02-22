@@ -16,4 +16,11 @@ public interface TestTaskRepository extends JpaRepository<Task, Long> {
             WHERE t.id = :id
             """)
     Status findStatusOf(Long id);
+
+    @Query("""
+            SELECT count(t.id)
+            FROM Task t
+            WHERE t.status = :status
+            """)
+    int countWithStatus(Status status);
 }
