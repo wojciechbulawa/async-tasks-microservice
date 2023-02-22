@@ -45,7 +45,7 @@ public class MainJob implements Runnable {
         SortedSet<SubTaskResult> results = getResults(futures);
 
         ProcessedText bestMatch = results.first().toProcessedText();
-        taskService.complete(splitter.getMainTask(), bestMatch.position(), bestMatch.typos());
+        taskService.complete(splitter.getMainTask(), bestMatch);
     }
 
     private Future<SubTaskResult> submitSubJob(SubTask subTask) {

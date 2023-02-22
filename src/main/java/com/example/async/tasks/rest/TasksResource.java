@@ -5,7 +5,10 @@ import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
 import com.example.async.tasks.mappers.ProcessingTaskMapper;
 import com.example.async.tasks.message.MsgSender;
+import com.example.async.tasks.service.ProcessedText;
+import com.example.async.tasks.service.ProcessingTask;
 import com.example.async.tasks.service.TaskService;
+import com.example.async.tasks.service.cache.TasksCache;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ public class TasksResource {
 
     private final MsgSender msgSender;
     private final TaskService taskService;
+    private final TasksCache tasksCache;
     private final ProcessingTaskMapper processingTaskMapper;
 
     @Secured("ROLE_USER")
@@ -37,8 +41,14 @@ public class TasksResource {
         log.info("Received /api/tasks/create request.\nPattern: {}\nInput: {}",
                 taskRequestDto.getPattern(), taskRequestDto.getInput());
         TaskResponseDto response = taskService.save(taskRequestDto);
-        msgSender.sendTask(processingTaskMapper
-                .toTask(taskRequestDto, response));
+        ProcessingTask processingTask = processingTaskMapper.toTask(taskRequestDto, response);
+        ProcessedText processedText = tasksCache.get(processingTask);
+
+        if (processedText == null) {
+            msgSender.sendTask(processingTask);
+        } else {
+            taskService.complete(processingTask, processedText);
+        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

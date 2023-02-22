@@ -23,6 +23,9 @@ executors:
 tasks:
   main-thread-pool: 4
   sub-thread-pool: 16
+  cache:
+    enabled: true
+    entry-lifetime: 1h
   delay:
     min-millis: 1000
     max-millis: 10000

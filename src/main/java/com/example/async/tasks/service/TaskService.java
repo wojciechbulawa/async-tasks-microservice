@@ -7,6 +7,7 @@ import com.example.async.tasks.entity.Status;
 import com.example.async.tasks.entity.Task;
 import com.example.async.tasks.mappers.TaskMapper;
 import com.example.async.tasks.repository.TaskRepository;
+import com.example.async.tasks.service.cache.TasksCache;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class TaskService {
 
     private final TaskRepository repository;
     private final TaskMapper mapper;
+    private final TasksCache tasksCache;
 
     @Transactional
     public TaskResponseDto save(TaskRequestDto dto) {
@@ -71,15 +73,16 @@ public class TaskService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void complete(ProcessingTask task, int position, int typos) {
+    public void complete(ProcessingTask task, ProcessedText result) {
         repository.findById(task.id())
                 .map(entity -> {
                     entity.setStatus(Status.COMPLETED);
                     entity.setPercentage(MAX_PERCENTAGE);
-                    entity.setPosition(position);
-                    entity.setTypos(typos);
+                    entity.setPosition(result.position());
+                    entity.setTypos(result.typos());
                     return entity;
                 });
+        tasksCache.put(task, result);
         log.info("Updated task[id={}] as completed", task.id());
     }
 
