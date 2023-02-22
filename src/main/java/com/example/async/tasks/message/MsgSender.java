@@ -3,6 +3,7 @@ package com.example.async.tasks.message;
 import com.example.async.tasks.config.rabbit.Exchanges;
 import com.example.async.tasks.config.rabbit.Queues;
 import com.example.async.tasks.dto.HelloMessage;
+import com.example.async.tasks.service.ProcessingTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,6 +22,10 @@ public class MsgSender {
 
     public void sendAsAdmin(HelloMessage msg) {
         send(msg, Exchanges.TOPIC, Queues.MSG_ROUTING_KEY + ".admin");
+    }
+
+    public void sendTask(ProcessingTask task) {
+        send(task, Exchanges.TOPIC, Queues.TASKS_ROUTING_KEY);
     }
 
     private void send(Object msg, String exchange, String routingKey) {

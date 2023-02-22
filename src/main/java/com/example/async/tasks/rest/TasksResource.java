@@ -4,7 +4,7 @@ import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
 import com.example.async.tasks.mappers.ProcessingTaskMapper;
-import com.example.async.tasks.service.ProcessingService;
+import com.example.async.tasks.message.MsgSender;
 import com.example.async.tasks.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/tasks")
 public class TasksResource {
 
+    private final MsgSender msgSender;
     private final TaskService taskService;
-    private final ProcessingService processingService;
     private final ProcessingTaskMapper processingTaskMapper;
 
     @Secured("ROLE_USER")
@@ -37,7 +37,9 @@ public class TasksResource {
         log.info("Received /api/tasks/create request.\nPattern: {}\nInput: {}",
                 taskRequestDto.getPattern(), taskRequestDto.getInput());
         TaskResponseDto response = taskService.save(taskRequestDto);
-        processingService.process(processingTaskMapper.toTask(taskRequestDto, response));
+        msgSender.sendTask(processingTaskMapper
+                .toTask(taskRequestDto, response));
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
