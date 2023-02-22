@@ -4,6 +4,7 @@ import com.example.async.tasks.TaskRepository;
 import com.example.async.tasks.dto.TaskDto;
 import com.example.async.tasks.dto.TaskRequestDto;
 import com.example.async.tasks.dto.TaskResponseDto;
+import com.example.async.tasks.entity.Status;
 import com.example.async.tasks.entity.Task;
 import com.example.async.tasks.mappers.TaskMapper;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,18 @@ public class TaskService {
 
         log.info("Found task with id: {}", id);
         return Optional.of(mapper.toFullDto(byId.get()));
+    }
+
+    @Transactional
+    public void complete(ProcessingTask task, int position, int typos) {
+        repository.findById(task.id())
+                .map(entity -> {
+                    entity.setStatus(Status.COMPLETED);
+                    entity.setPercentage(100);
+                    entity.setPosition(position);
+                    entity.setTypos(typos);
+                    return entity;
+                });
     }
 
 }
